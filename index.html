@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Mahir's Student Planner is a browser-based task manager for study, homework, and projects. Tasks stay on your device.">
+  <meta name="theme-color" content="#071226">
+  <title>Mahir's Student Planner</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("mahir-planner-theme");
+        if (saved === "light" || saved === "dark") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      } catch (error) {
+        /* Keep the default dark theme if storage is unavailable. */
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="orb orb-a" aria-hidden="true"></div>
+  <div class="orb orb-b" aria-hidden="true"></div>
+  <div class="orb orb-c" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#dashboard">
+      <span class="logo-mark" aria-hidden="true">M</span>
+      <span class="brand-copy">
+        <strong>MAHIR'S STUDENT PLANNER</strong>
+        <small>Study. Plan. Finish.</small>
+      </span>
+    </a>
+    <div class="topbar-tools">
+      <p class="live-clock">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4.5l3 2"></path></svg>
+        <time id="live-clock" datetime=""></time>
+      </p>
+      <button type="button" class="icon-btn" id="theme-toggle" aria-label="Switch to light mode" title="Switch to light mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"></path></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3.5A8.5 8.5 0 1 0 20.5 14 7 7 0 0 1 16 3.5z"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="app">
+    <aside class="sidebar glass">
+      <h2>View</h2>
+      <nav class="side-nav" aria-label="Task status">
+        <button type="button" class="filter-btn is-active" data-status="all">
+          <span>All tasks</span>
+          <span class="count" id="count-all">0</span>
+        </button>
+        <button type="button" class="filter-btn" data-status="pending">
+          <span>Pending</span>
+          <span class="count" id="count-pending">0</span>
+        </button>
+        <button type="button" class="filter-btn" data-status="completed">
+          <span>Completed</span>
+          <span class="count" id="count-completed">0</span>
+        </button>
+      </nav>
+
+      <h2>Categories</h2>
+      <div class="category-list" role="group" aria-label="Task categories">
+        <button type="button" class="filter-btn is-active" data-category="all">All</button>
+        <button type="button" class="filter-btn" data-category="Study"><i class="dot dot-study"></i>Study</button>
+        <button type="button" class="filter-btn" data-category="Homework"><i class="dot dot-homework"></i>Homework</button>
+        <button type="button" class="filter-btn" data-category="Personal"><i class="dot dot-personal"></i>Personal</button>
+        <button type="button" class="filter-btn" data-category="Projects"><i class="dot dot-projects"></i>Projects</button>
+        <button type="button" class="filter-btn" data-category="Other"><i class="dot dot-other"></i>Other</button>
+      </div>
+      <p class="sidebar-note">Everything is saved in this browser. No account, no server.</p>
+    </aside>
+
+    <main class="workspace" id="dashboard">
+      <section class="hero glass">
+        <div class="hero-copy">
+          <p class="eyebrow">Dashboard</p>
+          <h1>Welcome back, Mahir!</h1>
+          <p class="lede">A calm place for study sessions, homework deadlines, and project milestones.</p>
+          <p class="today-pill">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 10h16"></path></svg>
+            <span id="today-label">Today</span>
+          </p>
+        </div>
+        <div class="progress-panel">
+          <div class="progress-head">
+            <p id="progress-label">0% complete</p>
+            <p id="progress-detail">0 of 0 tasks completed</p>
+          </div>
+          <div class="progress" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Share of tasks completed">
+            <span id="progress-bar"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats" aria-label="Task summary">
+        <article class="stat glass">
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M8 6h11M8 12h11M8 18h11"></path><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"></path></svg>
+          </span>
+          <div>
+            <p class="stat-value" id="stat-total">0</p>
+            <p class="stat-label">Total tasks</p>
+          </div>
+        </article>
+        <article class="stat glass">
+          <span class="stat-icon stat-icon-done" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><path d="M8.5 12.5 11 15l4.5-5.5"></path></svg>
+          </span>
+          <div>
+            <p class="stat-value" id="stat-completed">0</p>
+            <p class="stat-label">Completed</p>
+          </div>
+        </article>
+        <article class="stat glass">
+          <span class="stat-icon stat-icon-wait" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v5l3 2"></path></svg>
+          </span>
+          <div>
+            <p class="stat-value" id="stat-pending">0</p>
+            <p class="stat-label">Pending</p>
+            <p class="stat-note" id="stat-overdue" hidden></p>
+          </div>
+        </article>
+        <article class="stat glass">
+          <span class="stat-icon stat-icon-today" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 10h16"></path></svg>
+          </span>
+          <div>
+            <p class="stat-value" id="stat-today">0</p>
+            <p class="stat-label">Due today</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="board">
+        <div class="board-head">
+          <div>
+            <h2>Tasks</h2>
+            <p id="result-count" aria-live="polite">No tasks yet</p>
+          </div>
+          <button type="button" class="btn btn-primary" id="new-task-btn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+            New task
+          </button>
+        </div>
+
+        <div class="toolbar">
+          <label class="search">
+            <span class="sr-only">Search tasks</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m20 20-3.5-3.5"></path></svg>
+            <input id="search-input" type="search" placeholder="Search tasks" autocomplete="off">
+            <button type="button" class="search-clear" id="clear-search" hidden aria-label="Clear search">&times;</button>
+          </label>
+          <label class="select-field">
+            <span>Priority</span>
+            <select id="priority-filter" aria-label="Filter by priority">
+              <option value="all">All priorities</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </label>
+          <label class="select-field">
+            <span>Deadline</span>
+            <select id="sort-select" aria-label="Sort by deadline">
+              <option value="deadline-asc">Soonest first</option>
+              <option value="deadline-desc">Latest first</option>
+              <option value="newest">Recently added</option>
+            </select>
+          </label>
+          <button type="button" class="btn btn-ghost" id="reset-filters" disabled>Reset</button>
+        </div>
+
+        <div id="task-list" class="task-list"></div>
+
+        <div class="empty glass" id="empty-state">
+          <div class="empty-art" aria-hidden="true">
+            <svg viewBox="0 0 120 120">
+              <rect x="28" y="22" width="64" height="78" rx="12"></rect>
+              <path d="M44 46h32M44 60h32M44 74h20"></path>
+              <circle cx="78" cy="78" r="16"></circle>
+              <path d="M78 70v8l5 3"></path>
+            </svg>
+          </div>
+          <h3 id="empty-title">Your planner is clear</h3>
+          <p id="empty-copy">Add a study block, homework deadline, or project milestone. It will still be here after you refresh.</p>
+          <div class="empty-actions">
+            <button type="button" class="btn btn-primary" id="empty-add">Add your first task</button>
+            <button type="button" class="btn btn-ghost" id="empty-reset" hidden>Clear filters</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">Saved automatically on this device with local storage. Refresh the page and your tasks remain.</footer>
+
+  <div class="modal-backdrop" id="form-modal" hidden>
+    <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="form-heading">
+      <div class="modal-head">
+        <h2 id="form-heading">New task</h2>
+        <button type="button" class="icon-btn" id="form-close" aria-label="Close dialog">&times;</button>
+      </div>
+      <form id="task-form" novalidate>
+        <label class="field">
+          <span>Task title</span>
+          <input id="field-title" name="title" type="text" maxlength="80" required autocomplete="off" placeholder="Review chapter 4">
+        </label>
+        <label class="field">
+          <span>Notes</span>
+          <textarea id="field-notes" name="notes" maxlength="280" rows="3" placeholder="Optional details"></textarea>
+        </label>
+        <div class="field-row">
+          <label class="field">
+            <span>Category</span>
+            <select id="field-category" name="category" required>
+              <option>Study</option>
+              <option>Homework</option>
+              <option>Personal</option>
+              <option>Projects</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Priority</span>
+            <select id="field-priority" name="priority" required>
+              <option>Low</option>
+              <option selected>Medium</option>
+              <option>High</option>
+            </select>
+          </label>
+        </div>
+        <label class="field">
+          <span>Deadline</span>
+          <input id="field-deadline" name="deadline" type="date" required>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="form-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="form-submit">Add task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="delete-modal" hidden>
+    <div class="modal glass modal-confirm" role="dialog" aria-modal="true" aria-labelledby="delete-heading">
+      <h2 id="delete-heading">Delete this task?</h2>
+      <p id="delete-message"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancel-delete">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirm-delete">Delete task</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toast-stack" aria-live="polite" aria-relevant="additions"></div>
+  <script src="script.js"></script>
+</body>
+</html>
